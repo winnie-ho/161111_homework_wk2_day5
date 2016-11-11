@@ -9,4 +9,7 @@ class Guest
     @fav_song = fav_song
   end
 
+  def fav_song_freakout
+  end
+
 end

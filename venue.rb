@@ -1,17 +1,13 @@
-require ('pry-byebug')
-
 class Venue
 
-  attr_accessor :room
+  attr_accessor :room_array
 
-  def initialize (room)
+  def initialize()
     @room_array = []
   end
 
-
   def add_room(room)
-
-    @room_array << room.room_num
+    @room_array << room
   end
 
 end

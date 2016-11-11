@@ -12,14 +12,19 @@ class Room
     @guest_register = []
   end
 
-  def add_guest(guest)
+  def checkin_guest(guest)
     unless entry_fee>guest.money
       @guest_register << guest.name
     end
   end
 
-  def add_song(song)
-    @room_playlist << song.title
+  def checkout_guest(guest)
+    for checked_in_guest in @guest_register
+      if checked_in_guest == guest.name
+        @guest_register.delete(guest.name)
+      end
+    end
+    return @guest_register
   end
 
   def room_full()
@@ -31,6 +36,9 @@ class Room
   end
 
 
+  def add_song(song)
+    @room_playlist << song.title
+  end
 
 
 end
