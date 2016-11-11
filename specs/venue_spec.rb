@@ -1,0 +1,26 @@
+require ('minitest/autorun')
+require ('minitest/rg')
+require_relative ('../room.rb')
+require_relative ('../song.rb')
+require_relative ('../guest.rb')
+require_relative ('../venue.rb')
+
+class TestVenue < Minitest::Test
+  
+  def setup
+    @venue = Venue.new ()
+    @room1 = Room.new(2, 10, 7.5)
+    @guest1 = Guest.new("Totoro", 50.00, "A Little Monster")
+    @guest2 = Guest.new("Ponyo", 5.00, "Sad")
+
+    @song1  = Song.new("A Little Monster", "Someone" )
+  end
+
+  def test_add_room
+    @venue.add_room(@room1)
+    assert_equal(@venue.room_array.count, 1)
+  end
+
+
+
+end

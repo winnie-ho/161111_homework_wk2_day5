@@ -14,5 +14,7 @@ class TestGuest < Minitest::Test
     assert_equal(@guest1.fav_song, "Crocodile Rock")
   end
 
+  def test_fav_song_freakout
 
+  end
 end
