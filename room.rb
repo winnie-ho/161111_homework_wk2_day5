@@ -19,9 +19,11 @@ class Room
   end
 
   def checkout_guest(guest)
-    for checked_in_guest in @guest_register
-      if checked_in_guest == guest.name
-        @guest_register.delete(guest.name)
+    unless @guest_register.count == 0
+      for checked_in_guest in @guest_register
+        if checked_in_guest == guest.name
+          @guest_register.delete(guest.name)
+        end
       end
     end
     return @guest_register
