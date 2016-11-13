@@ -13,10 +13,11 @@ MENU 1 (type number to select)
 
 @menu2 = "MENU 2 (type number to select)
   - 0 MENU BACK
-  - 1 Check-In Guest
-  - 2 Check-Out Guest
-  - 3 Add Song to Room
-  - 4 Add Order to Tab"
+  - 1 Remove Room
+  - 2 Check-In Guest
+  - 3 Check-Out Guest
+  - 4 Add Song to Room
+  - 5 Add Order to Tab"
   
 
 def create_room_interface()
@@ -37,6 +38,15 @@ def create_room_interface()
   room_to_add = Room.new(room_num, capacity, entry_fee)
   @venue.add_room(room_to_add)
 end
+
+def remove_room_interface()
+  puts "Are you sure you want to delete room: #{@venue.room_array[@menu_room_select-1].room_num}?"
+  puts "Y/N"
+  answer = gets.chomp.downcase
+    @venue.remove_room(@venue.room_array[@menu_room_select-1]) if answer == "y"
+end
+
+
 
 def view_existing_rooms_interface()
   if @venue.room_array.count == 0
@@ -60,11 +70,13 @@ end
 
 def exit_interface()
     puts "Exiting, Goodbye!"
+    exit
 end 
 
 def checkin_interface()
   if @taken>=@space
-    puts "This room is full"
+    puts "**Unable to add guest. This room is full!**"
+    menu_2_loop
   else
     puts "Check-in guest to room: #{@venue.room_array[@menu_room_select-1].room_num}"
 
@@ -80,11 +92,12 @@ def checkin_interface()
       Name: #{name}
       Credit: #{money}
       Favourite Song: #{fav_song}"
-    gets.chomp
 
     guest_to_add = Guest.new(name, money, fav_song)
 
     @venue.room_array[@menu_room_select-1].checkin_guest(guest_to_add)
+
+    menu_2_loop()
   end
 end
 
@@ -103,7 +116,7 @@ def menu_1_loop()
       create_room_interface()
       menu_1_loop
     elsif menu1_select == 2
-      view_existing_rooms_interface()
+      # view_existing_rooms_interface()
       menu_room_loop()
     else
       menu1_select != 0||1||2
@@ -115,19 +128,13 @@ end
 
 #MENU room loop
 def menu_room_loop()
+  view_existing_rooms_interface()
   @menu_room_select = gets.chomp.to_i
     if @menu_room_select == 0
-      menu_1_loop
-
+      menu_1_loop()
     else @venue.room_array.find{|r|@venue.room_array.index} == @menu_room_select-1
-
-      menu_2_loop
-
+      menu_2_loop()
     end
-
-
-
-
 end
 
 
@@ -143,37 +150,32 @@ def menu_2_loop()
   puts @menu2
   menu2_select = gets.chomp.to_i
     if menu2_select == 0
-      menu_1_loop
+      menu_room_loop()     
     elsif menu2_select == 1
+      remove_room_interface()
+      menu_room_loop
+    elsif menu2_select == 2
       checkin_interface()
       menu_2_loop
-    elsif menu2_select == 2
+    elsif menu2_select == 3
       checkout_interface()
       menu_2_loop
-    elsif menu2_select == 3
+    elsif menu2_select == 4
       add_song_interface
       menu_2_loop
-    elsif menu2_select == 4
+    elsif menu2_select == 5
       add_to_tab_interface
       menu_2_loop
-    else menu2_select != 0||1||2||3||4
+    else menu2_select != 0||1||2||3||4||5
       puts "ERROR, enter a valid option"
       menu_2_loop
     end
 end 
 
 
-puts @venue.room_array
+
 puts "Welcome to CodeClan Caraoke - putting the C in Karaoke!"
-menu_1_loop
-
-  # if menu1_select == 1
-
-
-
-
-
-
+menu_1_loop()
 
 
 

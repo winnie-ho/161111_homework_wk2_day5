@@ -10,4 +10,7 @@ class Venue
     @room_array << room
   end
 
+  def remove_room(room)
+    @room_array.delete(room)
+  end
 end
