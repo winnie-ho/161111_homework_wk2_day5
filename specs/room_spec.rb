@@ -20,13 +20,9 @@ class TestRoom < Minitest::Test
     assert_equal(@room1.entry_fee, 7.5)
   end
 
-  def test_bar_tab_starts_at_0
-    assert_equal(@room1.bar_tab, 0)
-  end
-
   def test_checkin_guest
     @room1.checkin_guest(@guest1)
-    assert_equal("Totoro", @room1.guest_register[0])
+    assert_equal("Totoro", @room1.guest_register[0].name)
   end
 
   def test_remove_guest
@@ -40,6 +36,8 @@ class TestRoom < Minitest::Test
   def test_checkin_guest__can_afford_fee
     @room1.checkin_guest(@guest1)
     assert_equal(1, @room1.guest_register.count)
+    assert_equal(7.5, @room1.tab)
+
   end
 
   def test_add_guest__cant_afford_fee
@@ -56,7 +54,18 @@ class TestRoom < Minitest::Test
 
   def test_add_song
     @room1.add_song(@song1)
-    assert_equal("A Little Monster", @room1.room_playlist[0])
+    assert_equal("A Little Monster", @room1.room_playlist[0].title)
   end
+
+  def test_remove_song
+    @room1.remove_song(@song1)
+    assert_equal(0, @room1.room_playlist.count)
+  end
+
+  def test_add_to_tab
+    @room1.add_to_tab(40)
+    assert_equal(40,@room1.tab)
+  end
+
 
 end

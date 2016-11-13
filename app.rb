@@ -17,7 +17,8 @@ MENU 1 (type number to select)
   - 2 Check-In Guest
   - 3 Check-Out Guest
   - 4 Add Song to Room
-  - 5 Add Order to Tab"
+  - 5 Remove Song from Room
+  - 6 Add/remove from Room Tab"
   
 
 def create_room_interface()
@@ -47,7 +48,6 @@ def remove_room_interface()
 end
 
 
-
 def view_existing_rooms_interface()
   if @venue.room_array.count == 0
       puts "
@@ -64,9 +64,6 @@ def view_existing_rooms_interface()
   end
 end
 
-    # puts "Enter room number to view"
-    # view_room_num = gets.chomp
-    # puts @venue.room_array[view_room_num]
 
 def exit_interface()
     puts "Exiting, Goodbye!"
@@ -74,13 +71,11 @@ def exit_interface()
 end 
 
 def checkin_interface()
-  if @taken>=@space
+  if @taken>=@venue.room_array[@menu_room_select-1].capacity.to_i
     puts "**Unable to add guest. This room is full!**"
     menu_2_loop
   else
     puts "Check-in guest to room: #{@venue.room_array[@menu_room_select-1].room_num}"
-
-
     puts "Enter name of guest"
     name = gets.chomp
     puts "Enter money"
@@ -93,12 +88,79 @@ def checkin_interface()
       Credit: #{money}
       Favourite Song: #{fav_song}"
 
-    guest_to_add = Guest.new(name, money, fav_song)
+    @guest_to_add = Guest.new(name, money, fav_song)
 
-    @venue.room_array[@menu_room_select-1].checkin_guest(guest_to_add)
+    @venue.room_array[@menu_room_select-1].checkin_guest(@guest_to_add)
 
+    if @venue.room_array[@menu_room_select-1].room_playlist.find{|s| s.title == @guest_to_add.fav_song}
+      puts "'YAAA DANCER!!!', #{@guest_to_add.name} is delighted their favourite song is on the room playlist"
+    end
     menu_2_loop()
   end
+end
+
+def checkout_interface
+  if @venue.room_array[@menu_room_select-1].guest_register.count == 0
+    puts "**There are no guests in this room!**"
+  else
+    puts "Select guest number you want to check out?"
+    
+    @venue.room_array[@menu_room_select-1].guest_register.inject(1){|count, g|
+      puts "  - #{count.to_s} #{g.name}"
+      count + 1
+    }
+
+    @guest_to_remove = gets.chomp.to_i
+    puts "Are you sure you want to remove #{@venue.room_array[@menu_room_select-1].guest_register[@guest_to_remove-1].name} from room: #{@venue.room_array[@menu_room_select-1].room_num}?"
+    puts "Y/N"
+    answer = gets.chomp.downcase
+    @venue.room_array[@menu_room_select-1].checkout_guest(@venue.room_array[@menu_room_select-1].guest_register[@guest_to_remove-1]) if answer == "y"
+  end
+end
+
+def add_song_interface
+    if @venue.room_array[@menu_room_select-1].room_playlist.count == 0
+      puts "Current room playlist: EMPTY"
+
+    else 
+      puts "Current room playlist:"
+      @venue.room_array[@menu_room_select-1].room_playlist.inject(1){|count,s|
+      puts "  -#{count} #{@venue.room_array[@menu_room_select-1].room_playlist[count-1].title}: #{@venue.room_array[@menu_room_select-1].room_playlist[count-1].artist}"
+      count+=1
+      }
+    end
+      puts "Enter song title"
+      title = gets.chomp
+      puts "Enter song artist"
+      artist = gets.chomp
+
+      song_to_add = Song.new(title, artist)
+      @venue.room_array[@menu_room_select-1].add_song(song_to_add)
+end
+
+def remove_song_interface
+    if @venue.room_array[@menu_room_select-1].room_playlist.count == 0
+      puts "Current room playlist: EMPTY"
+
+    else 
+      puts "Current room playlist:"
+      @venue.room_array[@menu_room_select-1].room_playlist.inject(1){|count,s|
+      puts "  -#{count} #{@venue.room_array[@menu_room_select-1].room_playlist[count-1].title}: #{@venue.room_array[@menu_room_select-1].room_playlist[count-1].artist}"
+      count+=1
+      }
+    end
+      puts "Select number of song to remove"
+      song_to_remove = gets.chomp.to_i
+      puts "Are you sure you want to remove #{@venue.room_array[@menu_room_select-1].room_playlist[song_to_remove-1].title} from room: #{@venue.room_array[@menu_room_select-1].room_num}?"
+      puts "Y/N"
+      answer = gets.chomp.downcase
+      @venue.room_array[@menu_room_select-1].remove_song(@venue.room_array[@menu_room_select-1].room_playlist[song_to_remove-1]) if answer == "y"
+end
+
+def add_to_tab_interface
+  puts "Enter value to add to room tab"
+  value_to_add = gets.chomp
+  @venue.room_array[@menu_room_select-1].add_to_tab(value_to_add)
 end
 
 
@@ -144,9 +206,34 @@ end
 def menu_2_loop()
   @taken = @venue.room_array[@menu_room_select-1].guest_register.count
   @space = @venue.room_array[@menu_room_select-1].capacity.to_i - @venue.room_array[@menu_room_select-1].guest_register.count
-
+  puts "___________________________________________"
   puts "You are viewing/editing room: #{@venue.room_array[@menu_room_select-1].room_num}"
   puts "There are #{@taken.to_s} guests and #{@space.to_s} space(s) left"
+    if @venue.room_array[@menu_room_select-1].guest_register.count==0
+      puts "Current guests in room: EMPTY"
+    else
+      puts "Current guests in room:"
+           @venue.room_array[@menu_room_select-1].guest_register.inject(1){|count, g|
+        puts "  - #{count.to_s} #{g.name}"
+        count + 1
+      }
+    end
+
+    if @venue.room_array[@menu_room_select-1].room_playlist.count==0    
+      puts "Current room playlist: EMPTY"
+    else
+      puts "Current room playlist:"
+      @venue.room_array[@menu_room_select-1].room_playlist.inject(1){|count,s|
+      puts "  -#{count} #{@venue.room_array[@menu_room_select-1].room_playlist[count-1].title}: #{@venue.room_array[@menu_room_select-1].room_playlist[count-1].artist}"
+      count+=1
+      }
+    end
+
+    puts "Room tab: £#{@venue.room_array[@menu_room_select-1].tab}"
+    puts "___________________________________________" 
+    puts ""   
+
+
   puts @menu2
   menu2_select = gets.chomp.to_i
     if menu2_select == 0
@@ -161,12 +248,15 @@ def menu_2_loop()
       checkout_interface()
       menu_2_loop
     elsif menu2_select == 4
-      add_song_interface
+      add_song_interface()
       menu_2_loop
     elsif menu2_select == 5
-      add_to_tab_interface
+      remove_song_interface()
       menu_2_loop
-    else menu2_select != 0||1||2||3||4||5
+    elsif menu2_select == 6
+      add_to_tab_interface()
+      menu_2_loop
+    else menu2_select != 0||1||2||3||4||5||6
       puts "ERROR, enter a valid option"
       menu_2_loop
     end
